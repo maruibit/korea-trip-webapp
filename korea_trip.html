@@ -333,6 +333,7 @@ function defaultState(){
 
 function loadState(){
   try{
+    if(window.__GMPRESET__)return JSON.parse(JSON.stringify(window.__GMPRESET__));
     const s=localStorage.getItem('ktrip_v1');
     return s?JSON.parse(s):defaultState();
   }catch(e){return defaultState()}
@@ -559,13 +560,18 @@ function importData(e){
 }
 
 function saveHtml(){
-  const html=document.documentElement.outerHTML;
-  const s=`<script>const _PRE=JSON.parse('${JSON.stringify(state).replace(/'/g,"\\'")}');function loadState(){return JSON.parse(JSON.stringify(_PRE))}</scr`+`ipt>`;
-  const final=html.replace(/<script>\nfunction loadState.*?<\/script>/s, s);
-  const blob=new Blob([final],{type:'text/html'});
+  const stateJson=JSON.stringify(state).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/<\/script>/gi,'<\\/script>');
+  const inject='<script id="__gmpreset__">window.__GMPRESET__=JSON.parse(\'' +stateJson+ '\');<\/script>';
+  let html=document.documentElement.outerHTML;
+  if(html.includes('id="__gmpreset__"')){
+    html=html.replace(/<script id="__gmpreset__">[\s\S]*?<\/script>/,inject);
+  } else {
+    html=html.replace('</head>',inject+'</head>');
+  }
+  const blob=new Blob([html],{type:'text/html'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download=`korea_trip_${state.startDate||'schedule'}.html`;
+  a.download='korea_trip_'+( state.startDate||'schedule')+'.html';
   a.click();
 }
 
