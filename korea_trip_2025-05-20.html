@@ -121,7 +121,7 @@
   <div class="trip-header">
     <div class="trip-top">
       <div class="trip-name-wrap">
-        <div class="trip-name" id="displayTripName">🇰🇷 韓国出張スケジュール</div>
+        <div class="trip-name" id="displayTripName">KR 韓国出張スケジュール</div>
         <div class="trip-dates" id="displayDates">2025年5月20日 〜 2025年5月21日</div>
       </div>
       <button class="edit-trip-btn" onclick="switchTab('settings',document.querySelectorAll('.tab')[2])">編集</button>
@@ -143,7 +143,7 @@
       </div><div class="card">
         <div class="card-icon i-meeting">🤝</div>
         <div class="card-body">
-          <div class="card-title">KYUNGSEO GLOTECH CO., LTD. ミーティング</div>
+          <div class="card-title">KYUNGSEO GLOTECH CO., LTD. 打ち合わせ</div>
           <div class="card-meta">午前９時30分</div>
           <div class="card-actions">
             <span class="badge b-ok">確定</span>
@@ -155,7 +155,7 @@
       </div><div class="card">
         <div class="card-icon i-meeting">🤝</div>
         <div class="card-body">
-          <div class="card-title">YOUNG SUN DIATECH ミーティング</div>
+          <div class="card-title">YOUNG SUN DIATECH 打ち合わせ</div>
           <div class="card-meta">午後1時30</div>
           <div class="card-actions">
             <span class="badge b-ok">確定</span>
@@ -248,8 +248,8 @@
     <div class="sheet-handle"></div>
     <div class="sheet-title" id="eventSheetTitle">日程を編集</div>
     <div class="type-row" id="typeRow">
-      <button class="type-btn sel" data-t="flight" onclick="selType(this)">✈️ フライト</button>
-      <button class="type-btn" data-t="meeting" onclick="selType(this)">🤝 商談</button>
+      <button class="type-btn" data-t="flight" onclick="selType(this)">✈️ フライト</button>
+      <button class="type-btn sel" data-t="meeting" onclick="selType(this)">🤝 商談</button>
       <button class="type-btn" data-t="hotel" onclick="selType(this)">🏨 ホテル</button>
       <button class="type-btn" data-t="meal" onclick="selType(this)">🍽️ 食事</button>
       <button class="type-btn" data-t="other" onclick="selType(this)">📌 その他</button>
@@ -333,6 +333,7 @@ function defaultState(){
 
 function loadState(){
   try{
+    if(window.__GMPRESET__)return JSON.parse(JSON.stringify(window.__GMPRESET__));
     const s=localStorage.getItem('ktrip_v1');
     return s?JSON.parse(s):defaultState();
   }catch(e){return defaultState()}
@@ -559,19 +560,8 @@ function importData(e){
 }
 
 function saveHtml(){
-  const html=document.documentElement.outerHTML;
-  const s=`<script>const _PRE=JSON.parse('${JSON.stringify(state).replace(/'/g,"\\'")}');function loadState(){return JSON.parse(JSON.stringify(_PRE))}</scr`+`ipt>`;
-  const final=html.replace(/<script>\nfunction loadState.*?<\/script>/s, s);
-  const blob=new Blob([final],{type:'text/html'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=`korea_trip_${state.startDate||'schedule'}.html`;
-  a.click();
-}
-
-// ── Init ──
-render();
-</script>
+  const stateJson=JSON.stringify(state).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/<\/script>/gi,'<\\/script>');
+  const inject='<script id="__gmpreset__">window.__GMPRESET__=JSON.parse('{"tripName":"KR 韓国出張スケジュール","startDate":"2025-05-20","endDate":"2025-05-21","note":"","members":[{"id":2,"name":"KANG (姓) MINSEOUNG (名)","role":""},{"id":7,"name":"KUNII (姓) KIYOSHI (名)","role":""},{"id":8,"name":"TOKITA (姓) HIROSHI (名)","role":""}],"events":[{"id":1,"type":"flight","date":"2025-05-20","time":"02:00","title":"羽田 T3 → 仁川T2 大韓航空 · KE752","meta":"往路：02:00、到着：04:35","status":"flight"},{"id":2,"type":"flight","date":"2025-05-21","time":"20:30","title":"仁川T2 → 羽田 T3 大韓航空 · KE751","meta":"往路：20:30、到着：22:50","status":"ok"},{"id":9,"type":"meeting","date":"2025-05-20","time":"09:30","title":"KYUNGSEO GLOTECH CO., LTD. 打ち合わせ","meta":"午前９時30分","status":"ok"},{"id":10,"type":"meeting","date":"2025-05-20","time":"14:00","title":"YOUNG SUN DIATECH 打ち合わせ","meta":"午後1時30","status":"ok"}],"nextId":11,"nextMid":9}');</script>
 
 
 </body></html>
