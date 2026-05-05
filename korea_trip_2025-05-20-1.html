@@ -1,0 +1,264 @@
+<html lang="ja"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🇰🇷 韓国出張スケジュール</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+  :root{
+    --bg:#F5F4F0;--surface:#fff;--border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.13);
+    --t1:#1C1C1E;--t2:#6B6B6B;--t3:#ABABAB;
+    --blue:#1D4ED8;--blue-bg:#EFF6FF;--blue-border:#BFDBFE;
+    --green:#15803D;--green-bg:#F0FDF4;--green-border:#BBF7D0;
+    --amber:#B45309;--amber-bg:#FFFBEB;--amber-border:#FDE68A;
+    --rose:#BE123C;--rose-bg:#FFF1F2;
+    --r:14px;--rsm:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;padding-bottom:2rem}
+
+  /* ── Tabs ── */
+  .tab-bar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;position:sticky;top:0;z-index:100}
+  .tab{flex:1;padding:.9rem .5rem;text-align:center;font-size:12px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+  .tab.active{color:var(--t1);border-bottom-color:var(--t1)}
+
+  /* ── Pages ── */
+  .page{display:none}.page.active{display:block}
+
+  /* ── Trip header ── */
+  .trip-header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem}
+  .trip-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .trip-name-wrap{flex:1}
+  .trip-name{font-size:17px;font-weight:700}
+  .trip-dates{font-size:12px;color:var(--t2);margin-top:2px}
+  .edit-trip-btn{font-size:11px;padding:4px 10px;border-radius:99px;border:1px solid var(--border2);background:transparent;cursor:pointer;color:var(--t2);font-family:'Noto Sans JP',sans-serif;white-space:nowrap}
+  .member-row{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap;align-items:center}
+  .member-chip{font-size:11px;padding:3px 10px;border-radius:99px;background:var(--bg);border:1px solid var(--border);color:var(--t2);display:flex;align-items:center;gap:4px}
+  .member-del{cursor:pointer;color:var(--t3);font-size:13px;line-height:1}
+  .add-member-btn{font-size:11px;padding:3px 10px;border-radius:99px;border:1px dashed var(--border2);background:transparent;color:var(--t3);cursor:pointer;font-family:'Noto Sans JP',sans-serif}
+
+  /* ── Day & cards ── */
+  .day-block{padding:1rem 1rem 0}
+  .day-header{display:flex;align-items:center;gap:8px;margin-bottom:.6rem}
+  .day-pill{font-size:10px;font-weight:700;background:var(--t1);color:#fff;padding:2px 8px;border-radius:99px;letter-spacing:.04em}
+  .day-date{font-size:12px;color:var(--t2);font-weight:500}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.5rem;display:flex;gap:11px;align-items:flex-start}
+  .card-icon{width:38px;height:38px;border-radius:var(--rsm);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .i-flight{background:var(--blue-bg)} .i-meeting{background:var(--green-bg)} .i-hotel{background:var(--amber-bg)} .i-meal{background:var(--rose-bg)} .i-other{background:#F3F4F6}
+  .card-body{flex:1;min-width:0}
+  .card-title{font-size:13.5px;font-weight:700}
+  .card-meta{font-size:11.5px;color:var(--t2);margin-top:2px}
+  .card-actions{display:flex;gap:8px;align-items:center;margin-top:5px}.card-actions .act-btn{display:none!important}
+  .badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500}
+  .b-ok{background:var(--green-bg);color:var(--green)} .b-flight{background:var(--blue-bg);color:var(--blue)} .b-pend{background:var(--amber-bg);color:var(--amber)} .b-tbd{background:#F3F4F6;color:#6B7280}
+  .act-btn{display:none}
+  
+  .card-time{font-size:12px;font-weight:700;white-space:nowrap;margin-top:2px}
+  .add-wrap{display:none}
+  .add-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:.7rem;border-radius:var(--rsm);border:1.5px dashed var(--border2);background:transparent;color:var(--t3);font-size:13px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;transition:all .15s}
+  .add-btn:hover{background:var(--surface);color:var(--t2)}
+
+  /* ── Members page ── */
+  .section{padding:1rem}
+  .section-title{font-size:12px;font-weight:700;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:.6rem}
+  .member-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:10px}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+  .member-info{flex:1}
+  .member-name{font-size:14px;font-weight:700}
+  .member-role{font-size:11.5px;color:var(--t2);margin-top:1px}
+  .del-btn{font-size:11px;color:#BE123C;cursor:pointer;background:none;border:none;font-family:'Noto Sans JP',sans-serif}
+
+  /* ── Settings page ── */
+  .settings-form{padding:1rem}
+  .flabel{font-size:11px;color:var(--t2);margin-bottom:4px;display:block;font-weight:500}
+  .fgroup{margin-bottom:.85rem}
+  input,select,textarea{width:100%;padding:.6rem .8rem;border:1px solid var(--border2);border-radius:var(--rsm);font-size:14px;font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--t1);outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff}
+  textarea{resize:vertical;min-height:70px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .save-btn{width:100%;padding:.75rem;border:none;border-radius:var(--rsm);background:var(--t1);color:#fff;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;margin-top:.5rem}
+  .danger-zone{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)}
+  .danger-title{font-size:12px;font-weight:700;color:#BE123C;margin-bottom:.5rem}
+  .danger-btn{width:100%;padding:.65rem;border:1px solid #FECACA;border-radius:var(--rsm);background:transparent;color:#BE123C;font-size:13px;font-family:'Noto Sans JP',sans-serif;cursor:pointer}
+
+  /* ── Export/Share bar ── */
+  .export-bar{display:none}
+  .export-btn{flex:1;padding:.85rem .5rem;text-align:center;font-size:11.5px;color:var(--t2);cursor:pointer;background:none;border:none;font-family:'Noto Sans JP',sans-serif;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:2px}
+  .export-btn:first-child{border-right:1px solid var(--border)}
+  .export-btn span{font-size:18px}
+
+  /* ── Modal ── */
+  .overlay{display:none!important}
+  .overlay.open{display:flex}
+  .sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:1.25rem 1rem 2rem;width:100%;max-height:92vh;overflow-y:auto}
+  .sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 1rem}
+  .sheet-title{font-size:16px;font-weight:700;margin-bottom:1rem}
+  .type-row{display:flex;gap:6px;margin-bottom:.9rem;flex-wrap:wrap}
+  .type-btn{font-size:12px;padding:5px 12px;border-radius:99px;border:1px solid var(--border2);background:var(--bg);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .15s}
+  .type-btn.sel{background:var(--t1);color:#fff;border-color:var(--t1)}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:1rem}
+  .btn-cancel{padding:.65rem;border:1px solid var(--border2);border-radius:var(--rsm);background:transparent;font-size:14px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;color:var(--t2)}
+  .btn-save{padding:.65rem;border:none;border-radius:var(--rsm);background:var(--t1);color:#fff;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer}
+
+  .empty-msg{text-align:center;padding:2.5rem 1rem;color:var(--t3);font-size:14px}
+  .save-indicator{display:none}
+  .save-indicator.show{opacity:1}
+</style>
+<script id="__gmpreset__">window.__GMPRESET__=JSON.parse('{"tripName": "KR 韓国出張スケジュール", "startDate": "2025-05-20", "endDate": "2025-05-21", "note": "", "members": [{"id": 2, "name": "KANG (姓) MINSEOUNG (名)", "role": ""}, {"id": 7, "name": "KUNII (姓) KIYOSHI (名)", "role": ""}, {"id": 8, "name": "TOKITA (姓) HIROSHI (名)", "role": ""}], "events": [{"id": 1, "type": "flight", "date": "2025-05-20", "time": "02:00", "title": "羽田 T3 → 仁川T2 大韓航空 · KE752", "meta": "往路：02:00、到着：04:35", "status": "flight"}, {"id": 2, "type": "flight", "date": "2025-05-21", "time": "20:30", "title": "仁川T2 → 羽田 T3 大韓航空 · KE751", "meta": "往路：20:30、到着：22:50", "status": "ok"}, {"id": 9, "type": "meeting", "date": "2025-05-20", "time": "09:30", "title": "KYUNGSEO GLOTECH CO., LTD. 打ち合わせ", "meta": "午前９時30分", "status": "ok"}, {"id": 10, "type": "meeting", "date": "2025-05-20", "time": "14:00", "title": "YOUNG SUN DIATECH 打ち合わせ", "meta": "午後1時30", "status": "ok"}], "nextId": 11, "nextMid": 9}');</script></head>
+<body>
+
+<!-- Tab bar -->
+<div class="tab-bar" style="justify-content:center">
+  <div class="tab active" style="flex:none;padding:.9rem 2rem">📅 日程</div>
+</div>
+
+<!-- Save indicator -->
+<div class="save-indicator" id="saveIndicator">💾 保存しました</div>
+
+<!-- ────── SCHEDULE PAGE ────── -->
+<div class="page active" id="page-schedule">
+  <div class="trip-header">
+    <div class="trip-top">
+      <div class="trip-name-wrap">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div class="trip-name" id="displayTripName">KR 韓国出張スケジュール</div>
+        </div><span style="font-size:11px;background:#ECFDF5;color:#15803D;border:1px solid #BBF7D0;padding:3px 10px;border-radius:99px;font-weight:500;white-space:nowrap">閲覧専用</span></div><div class="trip-dates" id="displayDates">2025年5月20日 〜 2025年5月21日</div>
+      </div>
+      
+    </div>
+    <div class="member-row" id="memberChips"><span class="member-chip">KANG (姓) MINSEOUNG (名)</span><span class="member-chip">KUNII (姓) KIYOSHI (名)</span><span class="member-chip">TOKITA (姓) HIROSHI (名)</span></div>
+  </div>
+  <div id="scheduleList"><div class="day-block"><div class="day-header"><span class="day-pill">DAY 1</span><span class="day-date">5月20日（火）</span></div><div class="card">
+        <div class="card-icon i-flight">✈️</div>
+        <div class="card-body">
+          <div class="card-title">羽田 T3 → 仁川T2 大韓航空 · KE752</div>
+          <div class="card-meta">往路：02:00、到着：04:35</div>
+          <div class="card-actions">
+            <span class="badge b-flight">搭乗確認済</span>
+          </div>
+        </div>
+        <div class="card-time">02:00</div>
+      </div><div class="card">
+        <div class="card-icon i-meeting">🤝</div>
+        <div class="card-body">
+          <div class="card-title">KYUNGSEO GLOTECH CO., LTD. 打ち合わせ</div>
+          <div class="card-meta">午前９時30分</div>
+          <div class="card-actions">
+            <span class="badge b-ok">確定</span>
+          </div>
+        </div>
+        <div class="card-time">09:30</div>
+      </div><div class="card">
+        <div class="card-icon i-meeting">🤝</div>
+        <div class="card-body">
+          <div class="card-title">YOUNG SUN DIATECH 打ち合わせ</div>
+          <div class="card-meta">午後1時30</div>
+          <div class="card-actions">
+            <span class="badge b-ok">確定</span>
+          </div>
+        </div>
+        <div class="card-time">14:00</div>
+      </div></div><div class="day-block"><div class="day-header"><span class="day-pill">DAY 2</span><span class="day-date">5月21日（水）</span></div><div class="card">
+        <div class="card-icon i-flight">✈️</div>
+        <div class="card-body">
+          <div class="card-title">仁川T2 → 羽田 T3 大韓航空 · KE751</div>
+          <div class="card-meta">往路：20:30、到着：22:50</div>
+          <div class="card-actions">
+            <span class="badge b-ok">確定</span>
+          </div>
+        </div>
+        <div class="card-time">20:30</div>
+      </div></div></div>
+  
+</div>
+
+
+
+
+<script>
+const ICONS={flight:'✈️',meeting:'🤝',hotel:'🏨',meal:'🍽️',other:'📌'};
+const ICON_CLASS={flight:'i-flight',meeting:'i-meeting',hotel:'i-hotel',meal:'i-meal',other:'i-other'};
+const BADGE_HTML={
+  ok:'<span class="badge b-ok">確定</span>',
+  flight:'<span class="badge b-flight">搭乗確認済</span>',
+  pend:'<span class="badge b-pend">調整中</span>',
+  tbd:'<span class="badge b-tbd">未定</span>'
+};
+const DAYS=['日','月','火','水','木','金','土'];
+
+function loadState(){
+  try{
+    if(window.__GMPRESET__)return JSON.parse(JSON.stringify(window.__GMPRESET__));
+    const s=localStorage.getItem('ktrip_v1');
+    return s?JSON.parse(s):defaultState();
+  }catch(e){return defaultState()}
+}
+
+function defaultState(){
+  return {
+    tripName:'🇰🇷 韓国出張スケジュール',
+    startDate:'2025-06-09',
+    endDate:'2025-06-11',
+    note:'',
+    members:[{id:1,name:'自分 (GM)',role:'GM合同会社'}],
+    events:[
+      {id:1,type:'flight',date:'2025-06-09',time:'08:30',title:'羽田 → 仁川 (NH861)',meta:'羽田 HND 第3ターミナル',status:'flight'},
+      {id:2,type:'meeting',date:'2025-06-09',time:'15:00',title:'商談 — ソウル貿易',meta:'江南区テヘラン路123・ソウル',status:'ok'},
+      {id:3,type:'hotel',date:'2025-06-09',time:'18:00',title:'チェックイン — ロッテホテルソウル',meta:'明洞・全員2泊予約',status:'ok'},
+      {id:4,type:'meeting',date:'2025-06-10',time:'10:00',title:'商談 — 韓国工具',meta:'九老デジタル団地・ソウル',status:'ok'},
+      {id:5,type:'meeting',date:'2025-06-10',time:'14:30',title:'商談 — 釜山ダイヤモンド',meta:'釜山出張（KTX移動）',status:'pend'},
+      {id:6,type:'meal',date:'2025-06-10',time:'19:00',title:'夕食',meta:'場所未定・全員参加',status:'tbd'},
+      {id:7,type:'hotel',date:'2025-06-11',time:'11:00',title:'チェックアウト',meta:'ロッテホテルソウル',status:'ok'},
+      {id:8,type:'flight',date:'2025-06-11',time:'16:00',title:'仁川 → 羽田 (NH862)',meta:'仁川 ICN 第1ターミナル',status:'flight'},
+    ],
+    nextId:9,nextMid:2
+  };
+}
+
+let state = loadState();
+
+function render(){
+  const sorted=[...state.events].sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  const days=[...new Set(sorted.map(e=>e.date))];
+  let html='';
+  days.forEach((d,i)=>{
+    const dt=new Date(d+'T12:00:00');
+    const label=`${dt.getMonth()+1}月${dt.getDate()}日（${DAYS[dt.getDay()]}）`;
+    html+=`<div class="day-block"><div class="day-header"><span class="day-pill">DAY ${i+1}</span><span class="day-date">${label}</span></div>`;
+    sorted.filter(e=>e.date===d).forEach(e=>{
+      html+=`<div class="card">
+        <div class="card-icon ${ICON_CLASS[e.type]}">${ICONS[e.type]}</div>
+        <div class="card-body">
+          <div class="card-title">${esc(e.title)}</div>
+          ${e.meta?`<div class="card-meta">${esc(e.meta)}</div>`:''}
+          <div class="card-actions">${BADGE_HTML[e.status]||''}</div>
+        </div>
+        <div class="card-time">${e.time}</div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('scheduleList').innerHTML=html||'<div class="empty-msg">日程がまだありません</div>';
+  renderHeader();
+}
+
+function renderHeader(){
+  const n=document.getElementById('displayTripName');
+  const d=document.getElementById('displayDates');
+  n.textContent=state.tripName||'出張スケジュール';
+  if(state.startDate&&state.endDate){
+    d.textContent=`${fmtDate(state.startDate)} 〜 ${fmtDate(state.endDate)}`;
+  } else {d.textContent='日程未設定'}
+  const chips=document.getElementById('memberChips');
+  chips.innerHTML=state.members.map(m=>`<span class="member-chip">${esc(m.name)}</span>`).join('');
+}
+
+function fmtDate(d){
+  const dt=new Date(d+'T12:00:00');
+  return `${dt.getFullYear()}年${dt.getMonth()+1}月${dt.getDate()}日`;
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+render();
+</script>
+
+
+</body></html>
