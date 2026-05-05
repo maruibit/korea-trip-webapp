@@ -1,0 +1,577 @@
+<html lang="ja"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🇰🇷 韓国出張スケジューラー</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+  :root{
+    --bg:#F5F4F0;--surface:#fff;--border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.13);
+    --t1:#1C1C1E;--t2:#6B6B6B;--t3:#ABABAB;
+    --blue:#1D4ED8;--blue-bg:#EFF6FF;--blue-border:#BFDBFE;
+    --green:#15803D;--green-bg:#F0FDF4;--green-border:#BBF7D0;
+    --amber:#B45309;--amber-bg:#FFFBEB;--amber-border:#FDE68A;
+    --rose:#BE123C;--rose-bg:#FFF1F2;
+    --r:14px;--rsm:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;padding-bottom:4rem}
+
+  /* ── Tabs ── */
+  .tab-bar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;position:sticky;top:0;z-index:100}
+  .tab{flex:1;padding:.9rem .5rem;text-align:center;font-size:12px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+  .tab.active{color:var(--t1);border-bottom-color:var(--t1)}
+
+  /* ── Pages ── */
+  .page{display:none}.page.active{display:block}
+
+  /* ── Trip header ── */
+  .trip-header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem}
+  .trip-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .trip-name-wrap{flex:1}
+  .trip-name{font-size:17px;font-weight:700}
+  .trip-dates{font-size:12px;color:var(--t2);margin-top:2px}
+  .edit-trip-btn{font-size:11px;padding:4px 10px;border-radius:99px;border:1px solid var(--border2);background:transparent;cursor:pointer;color:var(--t2);font-family:'Noto Sans JP',sans-serif;white-space:nowrap}
+  .member-row{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap;align-items:center}
+  .member-chip{font-size:11px;padding:3px 10px;border-radius:99px;background:var(--bg);border:1px solid var(--border);color:var(--t2);display:flex;align-items:center;gap:4px}
+  .member-del{cursor:pointer;color:var(--t3);font-size:13px;line-height:1}
+  .add-member-btn{font-size:11px;padding:3px 10px;border-radius:99px;border:1px dashed var(--border2);background:transparent;color:var(--t3);cursor:pointer;font-family:'Noto Sans JP',sans-serif}
+
+  /* ── Day & cards ── */
+  .day-block{padding:1rem 1rem 0}
+  .day-header{display:flex;align-items:center;gap:8px;margin-bottom:.6rem}
+  .day-pill{font-size:10px;font-weight:700;background:var(--t1);color:#fff;padding:2px 8px;border-radius:99px;letter-spacing:.04em}
+  .day-date{font-size:12px;color:var(--t2);font-weight:500}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.5rem;display:flex;gap:11px;align-items:flex-start}
+  .card-icon{width:38px;height:38px;border-radius:var(--rsm);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .i-flight{background:var(--blue-bg)} .i-meeting{background:var(--green-bg)} .i-hotel{background:var(--amber-bg)} .i-meal{background:var(--rose-bg)} .i-other{background:#F3F4F6}
+  .card-body{flex:1;min-width:0}
+  .card-title{font-size:13.5px;font-weight:700}
+  .card-meta{font-size:11.5px;color:var(--t2);margin-top:2px}
+  .card-actions{display:flex;gap:8px;align-items:center;margin-top:5px}
+  .badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500}
+  .b-ok{background:var(--green-bg);color:var(--green)} .b-flight{background:var(--blue-bg);color:var(--blue)} .b-pend{background:var(--amber-bg);color:var(--amber)} .b-tbd{background:#F3F4F6;color:#6B7280}
+  .act-btn{font-size:11px;color:var(--t3);cursor:pointer;background:none;border:none;font-family:'Noto Sans JP',sans-serif;padding:0}
+  .act-btn:hover{color:var(--t2)}
+  .card-time{font-size:12px;font-weight:700;white-space:nowrap;margin-top:2px}
+  .add-wrap{padding:.6rem 1rem 0}
+  .add-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:.7rem;border-radius:var(--rsm);border:1.5px dashed var(--border2);background:transparent;color:var(--t3);font-size:13px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;transition:all .15s}
+  .add-btn:hover{background:var(--surface);color:var(--t2)}
+
+  /* ── Members page ── */
+  .section{padding:1rem}
+  .section-title{font-size:12px;font-weight:700;color:var(--t2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:.6rem}
+  .member-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:10px}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+  .member-info{flex:1}
+  .member-name{font-size:14px;font-weight:700}
+  .member-role{font-size:11.5px;color:var(--t2);margin-top:1px}
+  .del-btn{font-size:11px;color:#BE123C;cursor:pointer;background:none;border:none;font-family:'Noto Sans JP',sans-serif}
+
+  /* ── Settings page ── */
+  .settings-form{padding:1rem}
+  .flabel{font-size:11px;color:var(--t2);margin-bottom:4px;display:block;font-weight:500}
+  .fgroup{margin-bottom:.85rem}
+  input,select,textarea{width:100%;padding:.6rem .8rem;border:1px solid var(--border2);border-radius:var(--rsm);font-size:14px;font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--t1);outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--blue);background:#fff}
+  textarea{resize:vertical;min-height:70px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .save-btn{width:100%;padding:.75rem;border:none;border-radius:var(--rsm);background:var(--t1);color:#fff;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;margin-top:.5rem}
+  .danger-zone{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border)}
+  .danger-title{font-size:12px;font-weight:700;color:#BE123C;margin-bottom:.5rem}
+  .danger-btn{width:100%;padding:.65rem;border:1px solid #FECACA;border-radius:var(--rsm);background:transparent;color:#BE123C;font-size:13px;font-family:'Noto Sans JP',sans-serif;cursor:pointer}
+
+  /* ── Export/Share bar ── */
+  .export-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:0;z-index:90}
+  .export-btn{flex:1;padding:.85rem .5rem;text-align:center;font-size:11.5px;color:var(--t2);cursor:pointer;background:none;border:none;font-family:'Noto Sans JP',sans-serif;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:2px}
+  .export-btn:first-child{border-right:1px solid var(--border)}
+  .export-btn span{font-size:18px}
+
+  /* ── Modal ── */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:none;align-items:flex-end}
+  .overlay.open{display:flex}
+  .sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:1.25rem 1rem 2rem;width:100%;max-height:92vh;overflow-y:auto}
+  .sheet-handle{width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 1rem}
+  .sheet-title{font-size:16px;font-weight:700;margin-bottom:1rem}
+  .type-row{display:flex;gap:6px;margin-bottom:.9rem;flex-wrap:wrap}
+  .type-btn{font-size:12px;padding:5px 12px;border-radius:99px;border:1px solid var(--border2);background:var(--bg);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .15s}
+  .type-btn.sel{background:var(--t1);color:#fff;border-color:var(--t1)}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:1rem}
+  .btn-cancel{padding:.65rem;border:1px solid var(--border2);border-radius:var(--rsm);background:transparent;font-size:14px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;color:var(--t2)}
+  .btn-save{padding:.65rem;border:none;border-radius:var(--rsm);background:var(--t1);color:#fff;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer}
+
+  .empty-msg{text-align:center;padding:2.5rem 1rem;color:var(--t3);font-size:14px}
+  .save-indicator{position:fixed;top:60px;right:12px;background:#1C1C1E;color:#fff;font-size:11px;padding:5px 12px;border-radius:99px;opacity:0;transition:opacity .3s;z-index:300;pointer-events:none}
+  .save-indicator.show{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- Tab bar -->
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('schedule',this)">📅 日程</div>
+  <div class="tab" onclick="switchTab('members',this)">👥 メンバー</div>
+  <div class="tab" onclick="switchTab('settings',this)">⚙️ 設定</div>
+</div>
+
+<!-- Save indicator -->
+<div class="save-indicator" id="saveIndicator">💾 保存しました</div>
+
+<!-- ────── SCHEDULE PAGE ────── -->
+<div class="page active" id="page-schedule">
+  <div class="trip-header">
+    <div class="trip-top">
+      <div class="trip-name-wrap">
+        <div class="trip-name" id="displayTripName">🇰🇷 韓国出張スケジュール</div>
+        <div class="trip-dates" id="displayDates">2025年5月20日 〜 2025年5月21日</div>
+      </div>
+      <button class="edit-trip-btn" onclick="switchTab('settings',document.querySelectorAll('.tab')[2])">編集</button>
+    </div>
+    <div class="member-row" id="memberChips"><span class="member-chip">KANG (姓) MINSEOUNG (名)</span><span class="member-chip">KUNII (姓) KIYOSHI (名)</span><span class="member-chip">TOKITA (姓) HIROSHI (名)</span></div>
+  </div>
+  <div id="scheduleList"><div class="day-block"><div class="day-header"><span class="day-pill">DAY 1</span><span class="day-date">5月20日（火）</span></div><div class="card">
+        <div class="card-icon i-flight">✈️</div>
+        <div class="card-body">
+          <div class="card-title">羽田 T3 → 仁川T2 大韓航空 · KE752</div>
+          <div class="card-meta">往路：02:00、到着：04:35</div>
+          <div class="card-actions">
+            <span class="badge b-flight">搭乗確認済</span>
+            <button class="act-btn" onclick="editEvent(1)">編集</button>
+            <button class="act-btn" style="color:#BE123C" onclick="deleteEvent(1)">削除</button>
+          </div>
+        </div>
+        <div class="card-time">02:00</div>
+      </div><div class="card">
+        <div class="card-icon i-meeting">🤝</div>
+        <div class="card-body">
+          <div class="card-title">KYUNGSEO GLOTECH CO., LTD. ミーティング</div>
+          <div class="card-meta">午前９時30分</div>
+          <div class="card-actions">
+            <span class="badge b-ok">確定</span>
+            <button class="act-btn" onclick="editEvent(9)">編集</button>
+            <button class="act-btn" style="color:#BE123C" onclick="deleteEvent(9)">削除</button>
+          </div>
+        </div>
+        <div class="card-time">09:30</div>
+      </div><div class="card">
+        <div class="card-icon i-meeting">🤝</div>
+        <div class="card-body">
+          <div class="card-title">YOUNG SUN DIATECH ミーティング</div>
+          <div class="card-meta">午後1時30</div>
+          <div class="card-actions">
+            <span class="badge b-ok">確定</span>
+            <button class="act-btn" onclick="editEvent(10)">編集</button>
+            <button class="act-btn" style="color:#BE123C" onclick="deleteEvent(10)">削除</button>
+          </div>
+        </div>
+        <div class="card-time">14:00</div>
+      </div></div><div class="day-block"><div class="day-header"><span class="day-pill">DAY 2</span><span class="day-date">5月21日（水）</span></div><div class="card">
+        <div class="card-icon i-flight">✈️</div>
+        <div class="card-body">
+          <div class="card-title">仁川T2 → 羽田 T3 大韓航空 · KE751</div>
+          <div class="card-meta">往路：20:30、到着：22:50</div>
+          <div class="card-actions">
+            <span class="badge b-ok">確定</span>
+            <button class="act-btn" onclick="editEvent(2)">編集</button>
+            <button class="act-btn" style="color:#BE123C" onclick="deleteEvent(2)">削除</button>
+          </div>
+        </div>
+        <div class="card-time">20:30</div>
+      </div></div></div>
+  <div class="add-wrap">
+    <button class="add-btn" onclick="openAddSheet()">＋ 日程を追加</button>
+  </div>
+</div>
+
+<!-- ────── MEMBERS PAGE ────── -->
+<div class="page" id="page-members">
+  <div class="section">
+    <div class="section-title">同行メンバー</div>
+    <div id="memberCards"><div class="member-card">
+      <div class="avatar" style="background:#EFF6FF;color:#1D4ED8">KA</div>
+      <div class="member-info">
+        <div class="member-name">KANG (姓) MINSEOUNG (名)</div>
+        <div class="member-role"></div>
+      </div>
+      <button class="del-btn" onclick="deleteMember(2)">削除</button>
+    </div><div class="member-card">
+      <div class="avatar" style="background:#F0FDF4;color:#15803D">KU</div>
+      <div class="member-info">
+        <div class="member-name">KUNII (姓) KIYOSHI (名)</div>
+        <div class="member-role"></div>
+      </div>
+      <button class="del-btn" onclick="deleteMember(7)">削除</button>
+    </div><div class="member-card">
+      <div class="avatar" style="background:#FFFBEB;color:#B45309">TO</div>
+      <div class="member-info">
+        <div class="member-name">TOKITA (姓) HIROSHI (名)</div>
+        <div class="member-role"></div>
+      </div>
+      <button class="del-btn" onclick="deleteMember(8)">削除</button>
+    </div></div>
+    <button class="add-btn" onclick="openMemberSheet()" style="margin-top:.5rem">＋ メンバーを追加</button>
+  </div>
+</div>
+
+<!-- ────── SETTINGS PAGE ────── -->
+<div class="page" id="page-settings">
+  <div class="settings-form">
+    <div class="section-title" style="margin-bottom:.8rem">出張情報</div>
+    <div class="fgroup"><label class="flabel">出張タイトル</label><input type="text" id="sTripName" placeholder="例：6月 ソウル出張" oninput="autoSaveSettings()"></div>
+    <div class="row2">
+      <div class="fgroup"><label class="flabel">出発日</label><input type="date" id="sStartDate" oninput="autoSaveSettings()"></div>
+      <div class="fgroup"><label class="flabel">帰国日</label><input type="date" id="sEndDate" oninput="autoSaveSettings()"></div>
+    </div>
+    <div class="fgroup"><label class="flabel">メモ・備考</label><textarea id="sNote" placeholder="注意事項、緊急連絡先など" oninput="autoSaveSettings()"></textarea></div>
+    <div class="danger-zone">
+      <div class="danger-title">データ管理</div>
+      <button class="danger-btn" onclick="exportData()">📤 データをエクスポート（JSON）</button>
+      <div style="margin-top:6px">
+        <button class="danger-btn" onclick="importTrigger()">📥 データをインポート</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      </div>
+      <div style="margin-top:6px">
+        <button class="danger-btn" onclick="resetAll()">🗑️ 全データをリセット</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ────── Export/Share bottom bar ────── -->
+<div class="export-bar">
+  <button class="export-btn" onclick="copyText()"><span>📋</span>テキストでコピー</button>
+  <button class="export-btn" onclick="saveHtml()"><span>💾</span>HTMLで保存</button>
+</div>
+
+<!-- ────── EVENT MODAL ────── -->
+<div class="overlay" id="eventOverlay" onclick="overlayTap(event,'eventOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="eventSheetTitle">日程を編集</div>
+    <div class="type-row" id="typeRow">
+      <button class="type-btn sel" data-t="flight" onclick="selType(this)">✈️ フライト</button>
+      <button class="type-btn" data-t="meeting" onclick="selType(this)">🤝 商談</button>
+      <button class="type-btn" data-t="hotel" onclick="selType(this)">🏨 ホテル</button>
+      <button class="type-btn" data-t="meal" onclick="selType(this)">🍽️ 食事</button>
+      <button class="type-btn" data-t="other" onclick="selType(this)">📌 その他</button>
+    </div>
+    <div class="row2">
+      <div class="fgroup"><label class="flabel">日付</label><input type="date" id="fDate"></div>
+      <div class="fgroup"><label class="flabel">時刻</label><input type="time" id="fTime" value="10:00"></div>
+    </div>
+    <div class="fgroup"><label class="flabel">タイトル</label><input type="text" id="fTitle" placeholder="例：仁川→羽田 (NH862)"></div>
+    <div class="fgroup"><label class="flabel">場所 / メモ</label><input type="text" id="fMeta" placeholder="場所・便名・担当者など"></div>
+    <div class="fgroup">
+      <label class="flabel">ステータス</label>
+      <select id="fStatus">
+        <option value="ok">確定</option>
+        <option value="flight">搭乗確認済</option>
+        <option value="pend">調整中</option>
+        <option value="tbd">未定</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeSheet('eventOverlay')">キャンセル</button>
+      <button class="btn-save" onclick="saveEvent()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ────── MEMBER MODAL ────── -->
+<div class="overlay" id="memberOverlay" onclick="overlayTap(event,'memberOverlay')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">メンバーを追加</div>
+    <div class="fgroup"><label class="flabel">名前</label><input type="text" id="mName" placeholder="例：田中 太郎"></div>
+    <div class="fgroup"><label class="flabel">役職 / 会社</label><input type="text" id="mRole" placeholder="例：営業部長 / GM合同会社"></div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeSheet('memberOverlay')">キャンセル</button>
+      <button class="btn-save" onclick="saveMember()">追加</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Constants ──
+const ICONS={flight:'✈️',meeting:'🤝',hotel:'🏨',meal:'🍽️',other:'📌'};
+const ICON_CLASS={flight:'i-flight',meeting:'i-meeting',hotel:'i-hotel',meal:'i-meal',other:'i-other'};
+const BADGE_HTML={
+  ok:'<span class="badge b-ok">確定</span>',
+  flight:'<span class="badge b-flight">搭乗確認済</span>',
+  pend:'<span class="badge b-pend">調整中</span>',
+  tbd:'<span class="badge b-tbd">未定</span>'
+};
+const DAYS=['日','月','火','水','木','金','土'];
+
+// ── State ──
+let state = loadState();
+let currentType='flight';
+let editId=null;
+
+function defaultState(){
+  return {
+    tripName:'🇰🇷 韓国出張スケジュール',
+    startDate:'2025-06-09',
+    endDate:'2025-06-11',
+    note:'',
+    members:[
+      {id:1,name:'自分 (GM)',role:'GM合同会社'},
+    ],
+    events:[
+      {id:1,type:'flight',date:'2025-06-09',time:'08:30',title:'羽田 → 仁川 (NH861)',meta:'羽田 HND 第3ターミナル',status:'flight'},
+      {id:2,type:'meeting',date:'2025-06-09',time:'15:00',title:'商談 — ソウル貿易',meta:'江南区テヘラン路123・ソウル',status:'ok'},
+      {id:3,type:'hotel',date:'2025-06-09',time:'18:00',title:'チェックイン — ロッテホテルソウル',meta:'明洞・全員2泊予約',status:'ok'},
+      {id:4,type:'meeting',date:'2025-06-10',time:'10:00',title:'商談 — 韓国工具',meta:'九老デジタル団地・ソウル',status:'ok'},
+      {id:5,type:'meeting',date:'2025-06-10',time:'14:30',title:'商談 — 釜山ダイヤモンド',meta:'釜山出張（KTX移動）',status:'pend'},
+      {id:6,type:'meal',date:'2025-06-10',time:'19:00',title:'夕食',meta:'場所未定・全員参加',status:'tbd'},
+      {id:7,type:'hotel',date:'2025-06-11',time:'11:00',title:'チェックアウト',meta:'ロッテホテルソウル',status:'ok'},
+      {id:8,type:'flight',date:'2025-06-11',time:'16:00',title:'仁川 → 羽田 (NH862)',meta:'仁川 ICN 第1ターミナル',status:'flight'},
+    ],
+    nextId:9,
+    nextMid:2
+  };
+}
+
+function loadState(){
+  try{
+    const s=localStorage.getItem('ktrip_v1');
+    return s?JSON.parse(s):defaultState();
+  }catch(e){return defaultState()}
+}
+
+function save(){
+  localStorage.setItem('ktrip_v1',JSON.stringify(state));
+  const ind=document.getElementById('saveIndicator');
+  ind.classList.add('show');
+  clearTimeout(ind._t);
+  ind._t=setTimeout(()=>ind.classList.remove('show'),1500);
+}
+
+// ── Tabs ──
+function switchTab(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+  if(id==='settings')loadSettings();
+  if(id==='members')renderMembers();
+}
+
+// ── Render schedule ──
+function render(){
+  const sorted=[...state.events].sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  const days=[...new Set(sorted.map(e=>e.date))];
+  let html='';
+  days.forEach((d,i)=>{
+    const dt=new Date(d+'T12:00:00');
+    const label=`${dt.getMonth()+1}月${dt.getDate()}日（${DAYS[dt.getDay()]}）`;
+    html+=`<div class="day-block"><div class="day-header"><span class="day-pill">DAY ${i+1}</span><span class="day-date">${label}</span></div>`;
+    sorted.filter(e=>e.date===d).forEach(e=>{
+      html+=`<div class="card">
+        <div class="card-icon ${ICON_CLASS[e.type]}">${ICONS[e.type]}</div>
+        <div class="card-body">
+          <div class="card-title">${esc(e.title)}</div>
+          ${e.meta?`<div class="card-meta">${esc(e.meta)}</div>`:''}
+          <div class="card-actions">
+            ${BADGE_HTML[e.status]||''}
+            <button class="act-btn" onclick="editEvent(${e.id})">編集</button>
+            <button class="act-btn" style="color:#BE123C" onclick="deleteEvent(${e.id})">削除</button>
+          </div>
+        </div>
+        <div class="card-time">${e.time}</div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('scheduleList').innerHTML=html||'<div class="empty-msg">日程がまだありません<br>＋ ボタンで追加してください</div>';
+  renderHeader();
+}
+
+function renderHeader(){
+  const n=document.getElementById('displayTripName');
+  const d=document.getElementById('displayDates');
+  n.textContent=state.tripName||'出張スケジュール';
+  if(state.startDate&&state.endDate){
+    d.textContent=`${fmtDate(state.startDate)} 〜 ${fmtDate(state.endDate)}`;
+  } else {d.textContent='日程未設定'}
+  const chips=document.getElementById('memberChips');
+  chips.innerHTML=state.members.map(m=>`<span class="member-chip">${esc(m.name)}</span>`).join('');
+}
+
+function fmtDate(d){
+  const dt=new Date(d+'T12:00:00');
+  return `${dt.getFullYear()}年${dt.getMonth()+1}月${dt.getDate()}日`;
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ── Members ──
+function renderMembers(){
+  const colors=['#EFF6FF:#1D4ED8','#F0FDF4:#15803D','#FFFBEB:#B45309','#FFF1F2:#BE123C','#F3F4F6:#374151'];
+  let html='';
+  state.members.forEach((m,i)=>{
+    const [bg,fg]=colors[i%colors.length].split(':');
+    const initials=m.name.replace(/\s*\(.*\)/,'').trim().slice(0,2);
+    html+=`<div class="member-card">
+      <div class="avatar" style="background:${bg};color:${fg}">${esc(initials)}</div>
+      <div class="member-info">
+        <div class="member-name">${esc(m.name)}</div>
+        <div class="member-role">${esc(m.role||'')}</div>
+      </div>
+      <button class="del-btn" onclick="deleteMember(${m.id})">削除</button>
+    </div>`;
+  });
+  document.getElementById('memberCards').innerHTML=html||'<div class="empty-msg">メンバーがいません</div>';
+}
+
+function openMemberSheet(){document.getElementById('memberOverlay').classList.add('open')}
+function saveMember(){
+  const name=document.getElementById('mName').value.trim();
+  const role=document.getElementById('mRole').value.trim();
+  if(!name){alert('名前を入力してください');return}
+  state.members.push({id:state.nextMid++,name,role});
+  save();renderMembers();renderHeader();
+  document.getElementById('mName').value='';document.getElementById('mRole').value='';
+  closeSheet('memberOverlay');
+}
+function deleteMember(id){
+  if(!confirm('このメンバーを削除しますか？'))return;
+  state.members=state.members.filter(m=>m.id!==id);
+  save();renderMembers();renderHeader();
+}
+
+// ── Settings ──
+function loadSettings(){
+  document.getElementById('sTripName').value=state.tripName||'';
+  document.getElementById('sStartDate').value=state.startDate||'';
+  document.getElementById('sEndDate').value=state.endDate||'';
+  document.getElementById('sNote').value=state.note||'';
+}
+function autoSaveSettings(){
+  state.tripName=document.getElementById('sTripName').value;
+  state.startDate=document.getElementById('sStartDate').value;
+  state.endDate=document.getElementById('sEndDate').value;
+  state.note=document.getElementById('sNote').value;
+  save();render();
+}
+function resetAll(){
+  if(!confirm('全データをリセットします。この操作は取り消せません。'))return;
+  state=defaultState();
+  save();render();renderHeader();loadSettings();
+  alert('リセットしました。');
+}
+
+// ── Event CRUD ──
+function openAddSheet(){
+  editId=null;currentType='flight';
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('sel',b.dataset.t==='flight'));
+  document.getElementById('fDate').value=state.startDate||'';
+  document.getElementById('fTime').value='10:00';
+  document.getElementById('fTitle').value='';
+  document.getElementById('fMeta').value='';
+  document.getElementById('fStatus').value='ok';
+  document.getElementById('eventSheetTitle').textContent='新規日程の追加';
+  document.getElementById('eventOverlay').classList.add('open');
+}
+function editEvent(id){
+  const ev=state.events.find(e=>e.id===id);if(!ev)return;
+  editId=id;currentType=ev.type;
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('sel',b.dataset.t===ev.type));
+  document.getElementById('fDate').value=ev.date;
+  document.getElementById('fTime').value=ev.time;
+  document.getElementById('fTitle').value=ev.title;
+  document.getElementById('fMeta').value=ev.meta||'';
+  document.getElementById('fStatus').value=ev.status;
+  document.getElementById('eventSheetTitle').textContent='日程を編集';
+  document.getElementById('eventOverlay').classList.add('open');
+}
+function saveEvent(){
+  const date=document.getElementById('fDate').value;
+  const time=document.getElementById('fTime').value;
+  const title=document.getElementById('fTitle').value.trim();
+  const meta=document.getElementById('fMeta').value.trim();
+  const status=document.getElementById('fStatus').value;
+  if(!title){alert('タイトルを入力してください。');return}
+  if(!date){alert('日付を選択してください。');return}
+  if(editId!==null){
+    const ev=state.events.find(e=>e.id===editId);
+    if(ev)Object.assign(ev,{type:currentType,date,time,title,meta,status});
+    editId=null;
+  } else {
+    state.events.push({id:state.nextId++,type:currentType,date,time,title,meta,status});
+  }
+  save();render();closeSheet('eventOverlay');
+}
+function deleteEvent(id){
+  if(!confirm('この日程を削除しますか？'))return;
+  state.events=state.events.filter(e=>e.id!==id);
+  save();render();
+}
+function selType(btn){
+  currentType=btn.dataset.t;
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+// ── Modal helpers ──
+function closeSheet(id){document.getElementById(id).classList.remove('open')}
+function overlayTap(e,id){if(e.target.id===id)closeSheet(id)}
+
+// ── Export / Share ──
+function copyText(){
+  const sorted=[...state.events].sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  const days=[...new Set(sorted.map(e=>e.date))];
+  const STATUS_TXT={ok:'確定',flight:'搭乗確認済',pend:'調整中',tbd:'未定'};
+  let txt=`${state.tripName}\n${state.startDate} 〜 ${state.endDate}\n`;
+  if(state.members.length)txt+=`メンバー: ${state.members.map(m=>m.name).join('、')}\n`;
+  txt+='\n';
+  days.forEach((d,i)=>{
+    const dt=new Date(d+'T12:00:00');
+    txt+=`【DAY ${i+1}】${dt.getMonth()+1}月${dt.getDate()}日（${DAYS[dt.getDay()]}）\n`;
+    sorted.filter(e=>e.date===d).forEach(e=>{
+      txt+=`  ${e.time} ${ICONS[e.type]} ${e.title}`;
+      if(e.meta)txt+=` (${e.meta})`;
+      txt+=` [${STATUS_TXT[e.status]||''}]\n`;
+    });
+    txt+='\n';
+  });
+  navigator.clipboard.writeText(txt).then(()=>alert('クリップボードにコピーしました！')).catch(()=>alert('コピーに失敗しました'));
+}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`korea_trip_${state.startDate||'data'}.json`;
+  a.click();
+}
+function importTrigger(){document.getElementById('importFile').click()}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(d.events&&d.members){state=d;save();render();renderHeader();alert('インポートしました！')}
+      else{alert('データ形式が正しくありません')}
+    }catch{alert('JSONの読み込みに失敗しました')}
+  };
+  r.readAsText(file);
+  e.target.value='';
+}
+
+function saveHtml(){
+  const html=document.documentElement.outerHTML;
+  const s=`<script>const _PRE=JSON.parse('${JSON.stringify(state).replace(/'/g,"\\'")}');function loadState(){return JSON.parse(JSON.stringify(_PRE))}</scr`+`ipt>`;
+  const final=html.replace(/<script>\nfunction loadState.*?<\/script>/s, s);
+  const blob=new Blob([final],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`korea_trip_${state.startDate||'schedule'}.html`;
+  a.click();
+}
+
+// ── Init ──
+render();
+</script>
+
+
+</body></html>
