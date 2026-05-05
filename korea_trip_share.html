@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🇰🇷 韓国出張スケジュール</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+  :root {
+    --bg: #F5F4F0;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.07);
+    --text1: #1C1C1E;
+    --text2: #6B6B6B;
+    --text3: #ABABAB;
+    --blue: #1D4ED8; --blue-bg: #EFF6FF;
+    --green: #15803D; --green-bg: #F0FDF4;
+    --amber: #B45309; --amber-bg: #FFFBEB;
+    --rose: #BE123C;  --rose-bg: #FFF1F2;
+    --r: 14px; --r-sm: 8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text1);min-height:100vh;padding-bottom:3rem}
+
+  /* ── Header ── */
+  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:1.1rem 1rem 0.9rem;position:sticky;top:0;z-index:100}
+  .header-top{display:flex;align-items:center;justify-content:space-between}
+  .trip-name{font-size:17px;font-weight:700;letter-spacing:-.3px}
+  .share-badge{font-size:11px;background:#ECFDF5;color:#15803D;border:1px solid #BBF7D0;padding:3px 10px;border-radius:99px;font-weight:500}
+  .trip-dates{font-size:12px;color:var(--text2);margin-top:3px}
+  .members{display:flex;gap:5px;margin-top:9px;flex-wrap:wrap}
+  .member{font-size:11px;padding:3px 10px;border-radius:99px;background:var(--bg);border:1px solid var(--border);color:var(--text2)}
+
+  /* ── Day section ── */
+  .day-block{padding:1rem 1rem 0}
+  .day-header{display:flex;align-items:center;gap:8px;margin-bottom:0.6rem}
+  .day-num{font-size:10px;font-weight:700;background:var(--text1);color:#fff;padding:2px 7px;border-radius:99px;letter-spacing:.05em}
+  .day-date{font-size:12px;color:var(--text2);font-weight:500}
+
+  /* ── Event card ── */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.5rem;display:flex;gap:11px;align-items:flex-start}
+  .card-icon{width:38px;height:38px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .icon-flight{background:var(--blue-bg)}
+  .icon-meeting{background:var(--green-bg)}
+  .icon-hotel{background:var(--amber-bg)}
+  .icon-meal{background:var(--rose-bg)}
+  .card-body{flex:1;min-width:0}
+  .card-title{font-size:13.5px;font-weight:700;line-height:1.3}
+  .card-meta{font-size:11.5px;color:var(--text2);margin-top:2px;line-height:1.4}
+  .card-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+  .card-time{font-size:12px;font-weight:700;color:var(--text1);white-space:nowrap}
+  .badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:500;white-space:nowrap}
+  .badge-ok{background:var(--green-bg);color:var(--green)}
+  .badge-flight{background:var(--blue-bg);color:var(--blue)}
+  .badge-pend{background:var(--amber-bg);color:var(--amber)}
+  .badge-tbd{background:#F3F4F6;color:#6B7280}
+
+  /* ── Add button ── */
+  .add-wrap{padding:.6rem 1rem 0}
+  .add-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:.7rem;border-radius:var(--r-sm);border:1.5px dashed var(--border);background:transparent;color:var(--text3);font-size:13px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;transition:all .15s}
+  .add-btn:hover{background:var(--surface);color:var(--text2);border-color:rgba(0,0,0,0.15)}
+
+  /* ── Modal ── */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;display:none;align-items:flex-end}
+  .overlay.open{display:flex}
+  .sheet{background:var(--surface);border-radius:20px 20px 0 0;padding:1.25rem 1rem 2rem;width:100%;max-height:90vh;overflow-y:auto}
+  .sheet-handle{width:36px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 1rem}
+  .sheet-title{font-size:16px;font-weight:700;margin-bottom:1rem}
+  .type-row{display:flex;gap:6px;margin-bottom:.9rem;flex-wrap:wrap}
+  .type-btn{font-size:12px;padding:5px 12px;border-radius:99px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-family:'Noto Sans JP',sans-serif;transition:all .15s}
+  .type-btn.sel{background:var(--text1);color:#fff;border-color:var(--text1)}
+  .flabel{font-size:11px;color:var(--text2);margin-bottom:4px;display:block;font-weight:500}
+  .fgroup{margin-bottom:.75rem}
+  input,select{width:100%;padding:.6rem .8rem;border:1px solid var(--border);border-radius:var(--r-sm);font-size:14px;font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text1);outline:none}
+  input:focus,select:focus{border-color:var(--blue);background:#fff}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:1rem}
+  .btn-cancel{padding:.65rem;border:1px solid var(--border);border-radius:var(--r-sm);background:transparent;font-size:14px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;color:var(--text2)}
+  .btn-save{padding:.65rem;border:none;border-radius:var(--r-sm);background:var(--text1);color:#fff;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer}
+
+  /* ── Edit mode ── */
+  .card.editing{border-color:#1D4ED8;background:#FAFCFF}
+  .card-delete{font-size:11px;color:var(--rose);cursor:pointer;margin-top:4px}
+
+  /* ── Notice bar ── */
+  .notice{font-size:11px;text-align:center;color:var(--text3);padding:.5rem 1rem 0}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="trip-name">🇰🇷 韓国出張スケジュール</div>
+    <span class="share-badge">共有版</span>
+  </div>
+  <div class="trip-dates" id="tripDates">— 日程を設定してください —</div>
+  <div class="members" id="memberList">
+    <span class="member">自分 (GM)</span>
+  </div>
+</div>
+
+<div id="schedule"></div>
+
+<div class="add-wrap">
+  <button class="add-btn" onclick="openSheet()">＋ 日程を追加</button>
+</div>
+<div class="notice">※ このファイルはローカル保存版です。ブラウザを閉じるとデータがリセットされます。</div>
+
+<!-- Modal Sheet -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="sheetTitle">新規日程の追加</div>
+    <div class="type-row" id="typeRow">
+      <button class="type-btn sel" data-t="flight" onclick="selType(this)">✈️ フライト</button>
+      <button class="type-btn" data-t="meeting" onclick="selType(this)">🤝 商談</button>
+      <button class="type-btn" data-t="hotel" onclick="selType(this)">🏨 ホテル</button>
+      <button class="type-btn" data-t="meal" onclick="selType(this)">🍽️ 食事</button>
+      <button class="type-btn" data-t="other" onclick="selType(this)">📌 その他</button>
+    </div>
+    <div class="row2">
+      <div class="fgroup"><label class="flabel">日付</label><input type="date" id="fDate"></div>
+      <div class="fgroup"><label class="flabel">時刻</label><input type="time" id="fTime" value="10:00"></div>
+    </div>
+    <div class="fgroup"><label class="flabel">タイトル</label><input type="text" id="fTitle" placeholder="例：仁川→羽田 (NH862)"></div>
+    <div class="fgroup"><label class="flabel">場所 / メモ</label><input type="text" id="fMeta" placeholder="場所・便名・担当者など"></div>
+    <div class="fgroup">
+      <label class="flabel">ステータス</label>
+      <select id="fStatus">
+        <option value="ok">確定</option>
+        <option value="flight">搭乗確認済</option>
+        <option value="pend">調整中</option>
+        <option value="tbd">未定</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-cancel" onclick="closeSheet()">キャンセル</button>
+      <button class="btn-save" onclick="saveEvent()">追加する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Data ──
+const ICONS = {flight:'✈️',meeting:'🤝',hotel:'🏨',meal:'🍽️',other:'📌'};
+const ICON_CLASS = {flight:'icon-flight',meeting:'icon-meeting',hotel:'icon-hotel',meal:'icon-meal',other:'icon-flight'};
+const BADGE = {
+  ok:'<span class="badge badge-ok">確定</span>',
+  flight:'<span class="badge badge-flight">搭乗確認済</span>',
+  pend:'<span class="badge badge-pend">調整中</span>',
+  tbd:'<span class="badge badge-tbd">未定</span>'
+};
+const DAYS = ['日','月','火','水','木','金','土'];
+
+let events = [
+  {id:1,type:'flight',date:'2025-06-09',time:'08:30',title:'羽田 → 仁川 (NH861)',meta:'羽田 HND 第3ターミナル',status:'flight'},
+  {id:2,type:'meeting',date:'2025-06-09',time:'15:00',title:'商談 — ソウル貿易',meta:'江南区テヘラン路123・ソウル',status:'ok'},
+  {id:3,type:'hotel',date:'2025-06-09',time:'18:00',title:'チェックイン — ロッテホテルソウル',meta:'明洞・全員2泊予約',status:'ok'},
+  {id:4,type:'meeting',date:'2025-06-10',time:'10:00',title:'商談 — 韓国工具',meta:'九老デジタル団地・ソウル',status:'ok'},
+  {id:5,type:'meeting',date:'2025-06-10',time:'14:30',title:'商談 — 釜山ダイヤモンド',meta:'釜山出張（KTX移動）',status:'pend'},
+  {id:6,type:'meal',date:'2025-06-10',time:'19:00',title:'夕食',meta:'場所未定・全員参加',status:'tbd'},
+  {id:7,type:'hotel',date:'2025-06-11',time:'11:00',title:'チェックアウト',meta:'ロッテホテルソウル',status:'ok'},
+  {id:8,type:'flight',date:'2025-06-11',time:'16:00',title:'仁川 → 羽田 (NH862)',meta:'仁川 ICN 第1ターミナル',status:'flight'},
+];
+let nextId = 9;
+let editId = null;
+let currentType = 'flight';
+
+// ── Render ──
+function render(){
+  const sorted = [...events].sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+  const days = [...new Set(sorted.map(e=>e.date))];
+  let html='';
+  days.forEach((d,i)=>{
+    const dt = new Date(d+'T12:00:00');
+    const label = `${dt.getMonth()+1}/${dt.getDate()}（${DAYS[dt.getDay()]}）`;
+    html+=`<div class="day-block"><div class="day-header"><span class="day-num">DAY ${i+1}</span><span class="day-date">${label}</span></div>`;
+    sorted.filter(e=>e.date===d).forEach(e=>{
+      html+=`<div class="card" id="card-${e.id}">
+        <div class="card-icon ${ICON_CLASS[e.type]}">${ICONS[e.type]}</div>
+        <div class="card-body">
+          <div class="card-title">${esc(e.title)}</div>
+          ${e.meta?`<div class="card-meta">${esc(e.meta)}</div>`:''}
+          <div style="margin-top:5px;display:flex;gap:5px;align-items:center">
+            ${BADGE[e.status]}
+            <span class="card-delete" onclick="deleteEvent(${e.id})">削除</span>
+            <span class="card-delete" style="color:var(--blue)" onclick="editEvent(${e.id})">編集</span>
+          </div>
+        </div>
+        <div class="card-right"><div class="card-time">${e.time}</div></div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('schedule').innerHTML = html || '<div style="text-align:center;padding:2rem;color:var(--text3);font-size:14px">日程がまだありません</div>';
+  updateHeader();
+}
+
+function updateHeader(){
+  const dates = events.map(e=>e.date).sort();
+  if(dates.length){
+    const s = fmtDate(dates[0]), e2 = fmtDate(dates[dates.length-1]);
+    document.getElementById('tripDates').textContent = s===e2?s:`${s} 〜 ${e2}`;
+  }
+}
+function fmtDate(d){
+  const dt=new Date(d+'T12:00:00');
+  return `${dt.getFullYear()}年${dt.getMonth()+1}月${dt.getDate()}日（${DAYS[dt.getDay()]}）`;
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ── Sheet ──
+function openSheet(){
+  editId=null;
+  currentType='flight';
+  document.querySelectorAll('.type-btn').forEach(b=>{b.classList.toggle('sel',b.dataset.t==='flight')});
+  document.getElementById('fDate').value='2025-06-09';
+  document.getElementById('fTime').value='10:00';
+  document.getElementById('fTitle').value='';
+  document.getElementById('fMeta').value='';
+  document.getElementById('fStatus').value='ok';
+  document.getElementById('sheetTitle').textContent='新規日程の追加';
+  document.getElementById('overlay').classList.add('open');
+}
+function closeSheet(){document.getElementById('overlay').classList.remove('open')}
+function overlayClick(e){if(e.target===document.getElementById('overlay'))closeSheet()}
+function selType(btn){
+  currentType=btn.dataset.t;
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+// ── CRUD ──
+function saveEvent(){
+  const date=document.getElementById('fDate').value;
+  const time=document.getElementById('fTime').value;
+  const title=document.getElementById('fTitle').value.trim();
+  const meta=document.getElementById('fMeta').value.trim();
+  const status=document.getElementById('fStatus').value;
+  if(!title){alert('タイトルを入力してください。');return}
+  if(!date){alert('日付を選択してください。');return}
+  if(editId!==null){
+    const ev=events.find(e=>e.id===editId);
+    if(ev){Object.assign(ev,{type:currentType,date,time,title,meta,status})}
+    editId=null;
+  } else {
+    events.push({id:nextId++,type:currentType,date,time,title,meta,status});
+  }
+  closeSheet();
+  render();
+}
+function deleteEvent(id){
+  if(!confirm('この日程を削除しますか？')){return}
+  events=events.filter(e=>e.id!==id);
+  render();
+}
+function editEvent(id){
+  const ev=events.find(e=>e.id===id);
+  if(!ev)return;
+  editId=id;
+  currentType=ev.type;
+  document.querySelectorAll('.type-btn').forEach(b=>{b.classList.toggle('sel',b.dataset.t===ev.type)});
+  document.getElementById('fDate').value=ev.date;
+  document.getElementById('fTime').value=ev.time;
+  document.getElementById('fTitle').value=ev.title;
+  document.getElementById('fMeta').value=ev.meta||'';
+  document.getElementById('fStatus').value=ev.status;
+  document.getElementById('sheetTitle').textContent='日程を編集';
+  document.getElementById('overlay').classList.add('open');
+}
+
+render();
+</script>
+</body>
+</html>
